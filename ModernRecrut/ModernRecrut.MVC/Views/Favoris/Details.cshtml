@@ -1,0 +1,53 @@
+﻿@model ModernRecrut.MVC.Models.OffreEmploi
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details de l'offre</h1>
+
+<div>    
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DateAffichage)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DateAffichage)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.DateDeFin)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.DateDeFin)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Poste)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Poste)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Nom)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Nom)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-area="" asp-controller="Favoris" asp-action="Delete" asp-route-id="@Model.Id">Supprimer</a> |
+    <a asp-action="Index">Retour à votre liste de favoris</a>
+</div>

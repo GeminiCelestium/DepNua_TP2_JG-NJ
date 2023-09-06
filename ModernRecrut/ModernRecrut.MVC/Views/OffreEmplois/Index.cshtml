@@ -1,0 +1,83 @@
+﻿@using ModernRecrut.MVC.Models
+@model IEnumerable<ModernRecrut.MVC.Models.OffreEmploi>
+@{
+    ViewData["Title"] = "Index";
+
+    var recherche = Context.Request.Query["recherche"].ToString();
+    var liste = new List<OffreEmploi>();
+    
+    liste = Model.ToList();
+
+
+    if (!string.IsNullOrEmpty(recherche))
+    {
+        liste = liste.Where(v => v.Poste.Contains(recherche)).ToList();
+    }
+}
+
+<h1>Liste des postes</h1>
+
+<p>
+    <a asp-action="Create">Ajout d'un nouveau poste</a>
+</p>
+<form>
+    <div class="form-actions no-color">
+        <p>            
+            <input type="text" name="recherche" value="@recherche" placeholder="Recherche par poste"/>
+            <input type="submit" value="Rechercher" class="btn btn-primary" />           
+        </p>
+    </div>
+</form>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            
+            <th>
+                @Html.DisplayNameFor(model => model.Nom)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Poste)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateAffichage)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DateDeFin)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in liste)
+        {
+            <tr>
+                
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nom)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Poste)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateAffichage)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateDeFin)
+                </td>
+                <td>
+                    @Html.ActionLink("Modifier", "Edit", new { id=item.Id  }) |
+                    @Html.ActionLink("Détails", "Details", new { id=item.Id }) |
+                    @Html.ActionLink("Supression", "Delete", new { id=item.Id }) |
+                    @Html.ActionLink("Ajouter au favoris", "Create", "Favoris" , new { id=item.Id }) |
+                    @Html.ActionLink("Postuler", "Postuler", "Postulation" , new { id=item.Id })
+                </td>
+            </tr>
+        }
+    </tbody>    
+</table>
+
+<p>
+    @Html.ActionLink("Retourner à la liste complète", "Index")
+</p>
+

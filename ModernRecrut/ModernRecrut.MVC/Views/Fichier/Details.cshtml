@@ -1,0 +1,36 @@
+﻿@model IEnumerable<ModernRecrut.MVC.Models.Fichier>
+
+@{
+    ViewData["Title"] = $"Liste des documents";
+}
+
+<p>
+    <a asp-action="Create">Téléverser un nouveau document</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.TypeDocument)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FileName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TypeDocument)
+                </td>
+                <td>
+                    <a href="@Html.DisplayFor(modelItem => item.FileName)">@Html.DisplayFor(modelItem => item.Name)</a>
+                </td>                
+            </tr>
+        }
+    </tbody>
+</table>

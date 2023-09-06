@@ -1,0 +1,55 @@
+﻿@model ModernRecrut.MVC.Models.OffreEmploi
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Suppression d'une offre d'emploi'</h1>
+
+<h3>Êtes-vous certain de vouloir supprimer cette offre d'emploi?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Id)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Id)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DateAffichage)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DateAffichage)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.DateDeFin)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.DateDeFin)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Poste)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Poste)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Nom)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Nom)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="submit" value="Suppression" class="btn btn-danger" /> |
+        <a asp-action="Index">Retour à votre liste de favoris</a>
+    </form>
+</div>

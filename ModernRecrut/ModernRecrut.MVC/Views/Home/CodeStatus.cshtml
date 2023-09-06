@@ -1,0 +1,32 @@
+﻿@model ModernRecrut.MVC.Models.CodeStatusViewModel
+
+@{
+    ViewData["Title"] = "Erreur";
+}
+
+
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.MessageErreur)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.MessageErreur)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.CodeStatus)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.CodeStatus)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.IdRequete)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.IdRequete)
+        </dd>
+        
+    </dl>
+
+<div>   
+    <a asp-controller="Home" asp-action="Index">Accueil</a>
+</div>

@@ -1,0 +1,39 @@
+﻿@model IEnumerable<ModernRecrut.MVC.Models.RoleViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Roles</h1>
+
+<p>
+    <a asp-action="Create">Créer un nouveau role</a>
+</p>
+<p>
+    <a asp-action="Attribution">Attribuer un role</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.RoleId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RoleName)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.RoleId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RoleName)
+            </td>            
+        </tr>
+}
+    </tbody>
+</table>

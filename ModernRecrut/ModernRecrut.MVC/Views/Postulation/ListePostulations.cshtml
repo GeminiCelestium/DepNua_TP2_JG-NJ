@@ -1,0 +1,47 @@
+﻿@using ModernRecrut.MVC.Models
+@model IEnumerable<ModernRecrut.MVC.Models.Postulation>
+
+
+@{
+    var liste = new List<Postulation>();
+
+    liste = Model.ToList();
+}
+
+<table class="table">
+    <thead>
+        <tr>
+
+            <th>
+                @Html.DisplayNameFor(model => model.DateDisponibilite)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PretentionSalariale)
+            </th>           
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in liste)
+        {
+            <tr>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.DateDisponibilite)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PretentionSalariale)
+                </td>               
+                
+                <td>
+                    @Html.ActionLink("Modifier", "Edit", new { id=item.Id  }) |
+                    @Html.ActionLink("Détails", "Details", new { id=item.Id }) |
+                    @Html.ActionLink("Supression", "Delete", new { id=item.Id }) |                                     
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<p>
+    @Html.ActionLink("Retourner à la liste complète", "Index", "Home")
+</p>
