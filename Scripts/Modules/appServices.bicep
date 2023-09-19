@@ -1,5 +1,5 @@
 param location string
-param appNamePrefix string
+param spName string
 
 param microServices array = [
   {
@@ -38,55 +38,49 @@ param microServices array = [
 
 resource appServicePlans 'Microsoft.Web/serverfarms@2022-09-01' = [
   for microService in microServices: {
-    name: 'sp-${appNamePrefix}-${microService.name}'
-    location: location
-    properties: {
-      name: 'sp-${appNamePrefix}-${microService.name}'
-      sku: {
-        name: microService.appServicePlanSku
-        tier: microService.appServicePlanSku
-      }
-    }
+    name: 'sp-${spName}-${microService.name}'
+    location: location    
+    sku: {
+      name: microService.appServicePlanSku
+      tier: microService.appServicePlanSku
+    }    
   }
 ]
 
 resource webApps 'Microsoft.Web/sites@2022-09-01' = [
   for microService in microServices: {
-    name: 'webapp-${appNamePrefix}-${microService.name}-${uniqueString(resourceGroup().id)}'
+    name: 'webapp-${microService.name}-${uniqueString(resourceGroup().id)}'
     location: location
     properties: {
       serverFarmId: microService.id
-      name: 'webapp-${appNamePrefix}-${microService.name}-${uniqueString(resourceGroup().id)}'
     }
     tags: {
-      Application: appNamePrefix
+      Application: spName
     }
   }
 ]
 
 resource appServiceSlots 'Microsoft.Web/sites/slots@2022-09-01' = [
   for microService in microServices: if (microService.appServicePlanSku == 'S1') {
-    name: 'webapp-${appNamePrefix}-${microService.name}-staging'
+    name: 'webapp-${spName}-${microService.name}-staging'
     location: location
     properties: {
-      serverFarmId: appServicePlans[microService.id]
-      name: 'webapp-${appNamePrefix}-${microService.name}-staging'
+      serverFarmId: microService.id      
     }
     tags: {
-      Application: appNamePrefix
+      Application: spName
     }
   }
 ]
 
 resource appServiceScaleRules 'Microsoft.Insights/autoscalesettings@2022-10-01' = [
   for microService in microServices: if (microService.appServicePlanSku == 'S1') {
+    location: location
     name: 'scaleRule-${microService.name}'
     properties: {
       direction: 'Increase'
       changeCount: 1
       changeCountDirection: 'Percent'
-      scaleInCooldown: 'PT10M'
-      scaleOutCooldown: 'PT10M'
       metricTrigger: {
         metricName: 'cpuPercentage'
         metricResourceUri: microService.id
@@ -95,5 +89,5 @@ resource appServiceScaleRules 'Microsoft.Insights/autoscalesettings@2022-10-01' 
         timeAggregation: 'Average'
       }
     }
-  }  
+  }    
 ]

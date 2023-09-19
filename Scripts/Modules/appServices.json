@@ -1,0 +1,129 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.20.4.51522",
+      "templateHash": "17555983927635996621"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string"
+    },
+    "spName": {
+      "type": "string"
+    },
+    "microServices": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "id": 1,
+          "name": "mvc",
+          "appServicePlanSku": "S1",
+          "createDatabase": false
+        },
+        {
+          "id": 2,
+          "name": "postulations",
+          "appServicePlanSku": "B1",
+          "databaseSku": "Standard",
+          "createDatabase": true
+        },
+        {
+          "id": 3,
+          "name": "emplois",
+          "appServicePlanSku": "F1",
+          "databaseSku": "Basic",
+          "createDatabase": true
+        },
+        {
+          "id": 4,
+          "name": "documents",
+          "appServicePlanSku": "F1",
+          "createDatabase": false
+        },
+        {
+          "id": 5,
+          "name": "favoris",
+          "appServicePlanSku": "F1",
+          "createDatabase": false
+        }
+      ]
+    }
+  },
+  "resources": [
+    {
+      "copy": {
+        "name": "appServicePlans",
+        "count": "[length(parameters('microServices'))]"
+      },
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2022-09-01",
+      "name": "[format('sp-{0}-{1}', parameters('spName'), parameters('microServices')[copyIndex()].name)]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('microServices')[copyIndex()].appServicePlanSku]",
+        "tier": "[parameters('microServices')[copyIndex()].appServicePlanSku]"
+      }
+    },
+    {
+      "copy": {
+        "name": "webApps",
+        "count": "[length(parameters('microServices'))]"
+      },
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2022-09-01",
+      "name": "[format('webapp-{0}-{1}-{2}', parameters('spName'), parameters('microServices')[copyIndex()].name, uniqueString(resourceGroup().id))]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "serverFarmId": "[parameters('microServices')[copyIndex()].id]"
+      },
+      "tags": {
+        "Application": "[parameters('spName')]"
+      }
+    },
+    {
+      "copy": {
+        "name": "appServiceSlots",
+        "count": "[length(parameters('microServices'))]"
+      },
+      "condition": "[equals(parameters('microServices')[copyIndex()].appServicePlanSku, 'S1')]",
+      "type": "Microsoft.Web/sites/slots",
+      "apiVersion": "2022-09-01",
+      "name": "[format('webapp-{0}-{1}-staging', parameters('spName'), parameters('microServices')[copyIndex()].name)]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "serverFarmId": "[parameters('microServices')[copyIndex()].id]"
+      },
+      "tags": {
+        "Application": "[parameters('spName')]"
+      }
+    },
+    {
+      "copy": {
+        "name": "appServiceScaleRules",
+        "count": "[length(parameters('microServices'))]"
+      },
+      "condition": "[equals(parameters('microServices')[copyIndex()].appServicePlanSku, 'S1')]",
+      "type": "Microsoft.Insights/autoscalesettings",
+      "apiVersion": "2022-10-01",
+      "name": "[format('scaleRule-{0}', parameters('microServices')[copyIndex()].name)]",
+      "properties": {
+        "direction": "Increase",
+        "changeCount": 1,
+        "changeCountDirection": "Percent",
+        "scaleInCooldown": "PT10M",
+        "scaleOutCooldown": "PT10M",
+        "metricTrigger": {
+          "metricName": "cpuPercentage",
+          "metricResourceUri": "[parameters('microServices')[copyIndex()].id]",
+          "operator": "GreaterThan",
+          "threshold": 80,
+          "timeAggregation": "Average"
+        }
+      }
+    }
+  ]
+}

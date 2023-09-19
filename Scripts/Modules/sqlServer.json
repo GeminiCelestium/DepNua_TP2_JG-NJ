@@ -1,0 +1,102 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.20.4.51522",
+      "templateHash": "15419795914645804045"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string"
+    },
+    "spName": {
+      "type": "string"
+    },
+    "dbUser": {
+      "type": "string"
+    },
+    "dbPassword": {
+      "type": "securestring",
+      "minLength": 10,
+      "maxLength": 20
+    },
+    "microServices": {
+      "type": "array",
+      "defaultValue": [
+        {
+          "name": "mvc",
+          "appServicePlanSku": "S1",
+          "createDatabase": false
+        },
+        {
+          "name": "postulations",
+          "appServicePlanSku": "B1",
+          "databaseSku": "Standard",
+          "createDatabase": true
+        },
+        {
+          "name": "emplois",
+          "appServicePlanSku": "F1",
+          "databaseSku": "Basic",
+          "createDatabase": true
+        },
+        {
+          "name": "documents",
+          "appServicePlanSku": "F1",
+          "createDatabase": false
+        },
+        {
+          "name": "favoris",
+          "appServicePlanSku": "F1",
+          "createDatabase": false
+        }
+      ]
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Sql/servers",
+      "apiVersion": "2021-11-01",
+      "name": "[format('srv-{0}', parameters('spName'))]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "administratorLogin": "[parameters('dbUser')]",
+        "administratorLoginPassword": "[parameters('dbPassword')]",
+        "version": "12.0"
+      }
+    },
+    {
+      "copy": {
+        "name": "sqlDatabases",
+        "count": "[length(parameters('microServices'))]"
+      },
+      "condition": "[parameters('microServices')[copyIndex()].createDatabase]",
+      "type": "Microsoft.Sql/servers/databases",
+      "apiVersion": "2021-11-01",
+      "name": "[format('{0}/{1}', format('srv-{0}', parameters('spName')), format('db-{0}-{1}', parameters('spName'), parameters('microServices')[copyIndex()].name))]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[if(equals(parameters('microServices')[copyIndex()].name, 'postulations'), 'S0', 'B0')]",
+        "tier": "[if(equals(parameters('microServices')[copyIndex()].name, 'postulations'), 'Standard', 'Basic')]"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', format('srv-{0}', parameters('spName')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Sql/servers/firewallRules",
+      "apiVersion": "2021-11-01",
+      "name": "[format('{0}/{1}', format('srv-{0}', parameters('spName')), 'AllowAllWindowsAzureIps')]",
+      "properties": {
+        "startIpAddress": "0.0.0.0",
+        "endIpAddress": "0.0.0.0"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Sql/servers', format('srv-{0}', parameters('spName')))]"
+      ]
+    }
+  ]
+}

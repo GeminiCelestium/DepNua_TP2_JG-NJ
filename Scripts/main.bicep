@@ -3,14 +3,16 @@
   'CanadaEast'
 ])
 param location string
-param appNamePrefix string = 'myapp'
-param dbAdminPassword string = 'YourAdminPasswordHere'
+param spName string = 'TP2-Script'
+@secure()
+param dbPassword string 
+param dbUser string = 'User123'
 
 module appServices './Modules/appServices.bicep' = {
   name: 'appServices'
   params: {
     location: location
-    appNamePrefix: appNamePrefix
+    spName: spName
   }
 }
 
@@ -18,8 +20,9 @@ module sqlServer './Modules/sqlServer.bicep' = {
   name: 'sqlServer'
   params: {
     location: location
-    appNamePrefix: appNamePrefix
-    dbAdminPassword: dbAdminPassword
+    spName: spName
+    dbPassword: dbPassword
+    dbUser: dbUser
   }
 }
 
@@ -27,6 +30,6 @@ module storageAccount './Modules/storageAccount.bicep' = {
   name: 'storageAccount'
   params: {
     location: location
-    appNamePrefix: appNamePrefix
+    spName: spName
   }
 }

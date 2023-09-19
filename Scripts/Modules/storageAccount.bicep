@@ -1,5 +1,5 @@
 param location string
-param appNamePrefix string
+param spName string
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
   name: 'storage${uniqueString(resourceGroup().id)}'
