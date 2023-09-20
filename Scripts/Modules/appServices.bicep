@@ -62,7 +62,7 @@ resource webApps 'Microsoft.Web/sites@2022-09-01' = [
 
 resource appServiceSlots 'Microsoft.Web/sites/slots@2022-09-01' = [
   for microService in microServices: if (microService.appServicePlanSku == 'S1') {
-    name: 'webapp-${spName}-${microService.name}-staging'
+    name: 'webapp/${microService.name}-staging'
     location: location
     properties: {
       serverFarmId: microService.id      
