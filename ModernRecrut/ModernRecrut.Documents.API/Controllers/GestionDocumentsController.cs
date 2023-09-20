@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ModernRecrut.Documents.API.Interfaces;
 using ModernRecrut.Documents.API.Models;
+using Azure.Storage.Blobs;
+using Azure.Storage.Sas;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -15,6 +17,8 @@ namespace ModernRecrut.Documents.API.Controllers
         private IGenererNom _genererNom;
 
         private string DirectoryPath;
+
+        private readonly string storageConnectionString = "PasEncoreCree";
 
         public GestionDocumentsController(IWebHostEnvironment env, IGenererNom genererNom)
         {
@@ -43,30 +47,31 @@ namespace ModernRecrut.Documents.API.Controllers
             var codeUtilisateur = fichierRecu.Id;
 
             byte[] bytes = Convert.FromBase64String(fichierRecu.DataFile);
-            MemoryStream stream = new MemoryStream(bytes);
-
-            IFormFile file = new FormFile(stream, 0, bytes.Length, fichierRecu.Name, fichierRecu.FileName);
 
             try
             {
-                Dictionary<int, string> mesDocuments = new Dictionary<int, string>();
+                BlobServiceClient blobServiceClient = new BlobServiceClient(storageConnectionString);
 
-                string nom = _genererNom.GenererNomFichier(codeUtilisateur, fichierRecu.TypeDocument.ToString(), fichierRecu.FileName);
+                BlobContainerClient containerClient = blobServiceClient.GetBlobContainerClient("images");
+                if (!containerClient.Exists())
+                {
+                    containerClient.Create();
+                }
 
-                //Chemin du fichier avec son nouveau nom
-                var documentPath = Path.Combine(DirectoryPath, nom);
+                string nomImage = _genererNom.GenererNomFichier(codeUtilisateur, "Image", fichierRecu.FileName);
 
-                var fileStream = new FileStream(documentPath, FileMode.Create);
-                await file.CopyToAsync(fileStream);
-                stream.Close();
-                fileStream.Close();
-                return CreatedAtAction(nameof(EnregistrementDocument), mesDocuments);
+                BlobClient blobClient = containerClient.GetBlobClient(nomImage);
+              
+                await blobClient.UploadAsync(new MemoryStream(bytes), true);
+
+                return Ok("Image enregistrée avec succès dans le compte de stockage.");
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest();
+                return StatusCode(500, $"Une erreur s'est produite : {ex.Message}");
             }
         }
+
 
         [HttpGet("any/{id}")]
         public bool AnyTypeDocumentPourUtilisateur(int id)
