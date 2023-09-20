@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using ModernRecrut.Postulations.API.Data;
 using ModernRecrut.Postulations.API.Models;
@@ -11,10 +12,12 @@ namespace ModernRecrut.Postulations.API.Controllers
     public class PostulationsController : ControllerBase
     {
         private readonly ModernRecrutPostulationContext _context;
+        private readonly IConfiguration _configuration;
 
-        public PostulationsController(ModernRecrutPostulationContext context)
+        public PostulationsController(ModernRecrutPostulationContext context, IConfiguration configuration)
         {
             _context = context;
+            _configuration = configuration;
         }
 
         // GET: api/Postulations
@@ -82,12 +85,17 @@ namespace ModernRecrut.Postulations.API.Controllers
         [HttpPost]
         public async Task<ActionResult<Postulation>> PostPostulation(Postulation postulation)
         {
-            if (_context.Postulation == null)
+            string connectionString = _configuration.GetConnectionString("AzureSqlConnection");
+             using (SqlConnection connection = new SqlConnection(connectionString))
             {
+                connection.Open();
+                if (_context.Postulation == null)
+                {
                 return Problem("Entity set 'ModernRecrutPostulationContext.Postulation'  is null.");
-            }
-            _context.Postulation.AddAsync(postulation);
-            await _context.SaveChangesAsync();
+                }
+                _context.Postulation.AddAsync(postulation);
+                await _context.SaveChangesAsync();
+             }
 
             return CreatedAtAction("GetPostulation", new { id = postulation.Id }, postulation);
         }
