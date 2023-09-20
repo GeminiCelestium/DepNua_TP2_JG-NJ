@@ -1,5 +1,6 @@
 param location string
 param spName string
+param serverName string = 'srv-${spName}'
 
 param microServices array = [
   {
@@ -52,7 +53,7 @@ resource webApps 'Microsoft.Web/sites@2022-09-01' = [
     name: 'webapp-${microService.name}-${uniqueString(resourceGroup().id)}'
     location: location
     properties: {
-      serverFarmId: microService.id
+      serverFarmId: resourceId('Microsoft.Web/serverfarms', 'sp-${spName}-${microService.name}')
     }
     tags: {
       Application: spName
@@ -65,7 +66,8 @@ resource appServiceSlots 'Microsoft.Web/sites/slots@2022-09-01' = [
     name: 'webapp/${microService.name}-staging'
     location: location
     properties: {
-      serverFarmId: microService.id      
+      serverFarmId: resourceId('Microsoft.Web/serverfarms', 'sp-${spName}-${microService.name}')
+
     }
     tags: {
       Application: spName
