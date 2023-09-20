@@ -18,7 +18,7 @@ namespace ModernRecrut.Documents.API.Controllers
 
         private string DirectoryPath;
 
-        private readonly string storageConnectionString = "PasEncoreCree";
+        private readonly string storageConnectionString = "Kz4INMoXNpR0Xb/tvs9kpha4XzpHwnJmVFCk1w+W6kAV3Iqv7ZOhtJELEVDuR3/B2p5VzCa1B2Hf+AStb4SIAw==";
 
         public GestionDocumentsController(IWebHostEnvironment env, IGenererNom genererNom)
         {
