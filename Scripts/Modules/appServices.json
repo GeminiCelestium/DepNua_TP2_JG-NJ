@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.20.4.51522",
-      "templateHash": "17555983927635996621"
+      "templateHash": "16589615511649575090"
     }
   },
   "parameters": {
@@ -75,7 +75,7 @@
       },
       "type": "Microsoft.Web/sites",
       "apiVersion": "2022-09-01",
-      "name": "[format('webapp-{0}-{1}-{2}', parameters('spName'), parameters('microServices')[copyIndex()].name, uniqueString(resourceGroup().id))]",
+      "name": "[format('webapp-{0}-{1}', parameters('microServices')[copyIndex()].name, uniqueString(resourceGroup().id))]",
       "location": "[parameters('location')]",
       "properties": {
         "serverFarmId": "[parameters('microServices')[copyIndex()].id]"
@@ -110,19 +110,38 @@
       "type": "Microsoft.Insights/autoscalesettings",
       "apiVersion": "2022-10-01",
       "name": "[format('scaleRule-{0}', parameters('microServices')[copyIndex()].name)]",
+      "location": "[parameters('location')]",
       "properties": {
-        "direction": "Increase",
-        "changeCount": 1,
-        "changeCountDirection": "Percent",
-        "scaleInCooldown": "PT10M",
-        "scaleOutCooldown": "PT10M",
-        "metricTrigger": {
-          "metricName": "cpuPercentage",
-          "metricResourceUri": "[parameters('microServices')[copyIndex()].id]",
-          "operator": "GreaterThan",
-          "threshold": 80,
-          "timeAggregation": "Average"
-        }
+        "profiles": [
+          {
+            "name": "default",
+            "capacity": {
+              "minimum": "1",
+              "maximum": "10",
+              "default": "1"
+            },
+            "rules": [
+              {
+                "metricTrigger": {
+                  "metricName": "cpuPercentage",
+                  "metricResourceUri": "[parameters('microServices')[copyIndex()].id]",
+                  "operator": "GreaterThan",
+                  "threshold": 80,
+                  "timeAggregation": "Average",
+                  "statistic": "Average",
+                  "timeGrain": "PT1M",
+                  "timeWindow": "PT5M"
+                },
+                "scaleAction": {
+                  "direction": "Increase",
+                  "type": "ChangeCount",
+                  "value": "1",
+                  "cooldown": "PT5M"
+                }
+              }
+            ]
+          }
+        ]
       }
     }
   ]

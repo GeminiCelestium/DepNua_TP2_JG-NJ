@@ -78,16 +78,36 @@ resource appServiceScaleRules 'Microsoft.Insights/autoscalesettings@2022-10-01' 
     location: location
     name: 'scaleRule-${microService.name}'
     properties: {
-      direction: 'Increase'
-      changeCount: 1
-      changeCountDirection: 'Percent'
-      metricTrigger: {
-        metricName: 'cpuPercentage'
-        metricResourceUri: microService.id
-        operator: 'GreaterThan'
-        threshold: 80
-        timeAggregation: 'Average'
-      }
+      profiles: [
+        {
+          name: 'default'
+          capacity: {
+            minimum: '1'
+            maximum: '10'
+            default: '1'
+          }
+          rules: [
+            {
+              metricTrigger: {
+                metricName: 'cpuPercentage'
+                metricResourceUri: microService.id
+                operator: 'GreaterThan'
+                threshold: 80
+                timeAggregation: 'Average'
+                statistic: 'Average'
+                timeGrain: 'PT1M'
+                timeWindow: 'PT5M'
+              }
+              scaleAction: {
+                direction: 'Increase'
+                type: 'ChangeCount'
+                value: '1'
+                cooldown: 'PT5M'
+              }
+            }
+          ]
+        }
+      ]
     }
   }    
 ]

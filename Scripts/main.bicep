@@ -30,6 +30,5 @@ module storageAccount './Modules/storageAccount.bicep' = {
   name: 'storageAccount'
   params: {
     location: location
-    spName: spName
   }
 }
